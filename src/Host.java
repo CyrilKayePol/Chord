@@ -4,17 +4,14 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 public class Host{
 	private int port = 8888;
 	private DatagramSocket socket;
 	private byte[] buf = new byte[1024000];
-	private ArrayList<Node> connectedNodes;
-	
 	public Host() throws Exception {
-		connectedNodes = new ArrayList<Node>();
+		new ArrayList<Node>();
 		socket = new DatagramSocket(port);
 		createRing();
 		run();
@@ -37,7 +34,6 @@ public class Host{
 				new RandomNode(socket, packet.getAddress(), packet.getPort()).start();
 			}else if(string[0].equals("JOIN")){
 				new JoinProcess(socket, new BigInteger(string[1]), string[2], packet.getPort()).start();
-				
 			}
 		}
 	}

@@ -36,6 +36,7 @@ public class JoinProcess extends Thread {
 		
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void run() {
 		try {
 			procedure();

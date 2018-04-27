@@ -10,7 +10,7 @@ public class Client {
 	DatagramSocket socket;
 	DatagramPacket packet;
 	Sender send;
-	int port = 8877;
+	int port = 4598;
 	int hostPort = 8888;
 	String nodeAdd;
 	int nodePort;
@@ -40,6 +40,7 @@ public class Client {
 			}
 	 
 			String received = new String(packet.getData(), 0, packet.getLength());
+			System.out.println("\n\t\t["+packet.getAddress()+": "+received+"]");
 			String[] string = received.split("_");
 			 if(string[0].equals("JOIN")){
 				new JoinProcess(socket, new BigInteger(string[1]), string[2], packet.getPort()).start();

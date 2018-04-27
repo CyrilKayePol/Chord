@@ -13,6 +13,7 @@ public class RandomNode extends Thread {
 		this.port = port;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void run() {
 		Random rand = new Random();
 		int index = rand.nextInt(Chord.getConnectedNodesCount());
@@ -24,7 +25,7 @@ public class RandomNode extends Thread {
 		Sender send = new Sender(socket, buf, address, port);
 		send.start();
 		
-		System.out.println("HOST sent "+message+" successfully.");
+		System.out.println("Host sent "+message+" successfully.");
 		stop();
 	}
 }
