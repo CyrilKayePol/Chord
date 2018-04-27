@@ -1,3 +1,5 @@
+import java.io.IOException;
+import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -8,10 +10,12 @@ public class Client {
 	DatagramSocket socket;
 	DatagramPacket packet;
 	Sender send;
-	int port = 8887;
+	int port = 8877;
 	int hostPort = 8888;
 	String nodeAdd;
 	int nodePort;
+	private byte[] buf = new byte[1024000];
+	
 	public Client() throws Exception {
 		socket = new DatagramSocket(port);
 		node = new Node(InetAddress.getLocalHost().getHostAddress(), port);
@@ -20,6 +24,28 @@ public class Client {
 		
 		// ask random node to join
 		join("JOIN_"+node.getID()+"_"+InetAddress.getLocalHost().getHostAddress(), nodePort);
+		
+		run();
+	}
+	
+	public void run() throws UnknownHostException {
+		while(true) {
+			DatagramPacket packet = new DatagramPacket(buf, buf.length);
+			try {
+				socket.receive(packet);
+				
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+			}
+	 
+			String received = new String(packet.getData(), 0, packet.getLength());
+			String[] string = received.split("_");
+			 if(string[0].equals("JOIN")){
+				new JoinProcess(socket, new BigInteger(string[1]), string[2], packet.getPort()).start();
+				
+			}
+		}
 	}
 	
 	private String join(String message, int hostPort) throws UnknownHostException {
@@ -33,13 +59,14 @@ public class Client {
 		buf = new byte[10240000];
 		packet = new DatagramPacket(buf, buf.length);
 		
+		System.out.println("waiting for response. . .");
 		try {
 			socket.receive(packet);
 		}catch(Exception e) {e.printStackTrace();}
 		
 		String received = new String(packet.getData(), 0, packet.getLength());
 		System.out.println("\n\t\t["+packet.getAddress()+": "+received+"]");
-	
+		
 		return received;
 	}
 	

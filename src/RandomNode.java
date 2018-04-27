@@ -16,7 +16,7 @@ public class RandomNode extends Thread {
 	public void run() {
 		Random rand = new Random();
 		int index = rand.nextInt(Chord.getConnectedNodesCount());
-		
+		System.out.println("\nCOUNT = "+Chord.getConnectedNodesCount());
 		ArrayList<Node> nodes = Chord.getConnectedNodes();
 		String message = "RAND_"+nodes.get(index).getIPAddress()+"_"+nodes.get(index).getPort();
 		byte[] buf = message.getBytes();

@@ -30,23 +30,23 @@ public class Chord{
 				
 				if(a == 0) {
 					temp = connectedNodes.get(a);
-					System.out.println("HERKKLE");
+					//System.out.println("HERKKLE");
 				}else {
 					if(temp.getID() == null) {
 						temp = connectedNodes.get(a);
-						System.out.println("HERE");
+						//System.out.println("HERE");
 						continue;
 					}
 					
 					if(1 == temp.getID().compareTo(connectedNodes.get(a).getID())) {
 						temp = connectedNodes.get(a);
-						System.out.println("here");
+						//System.out.println("here");
 					}
 				}
 				//System.out.println(temp.getID());
 			}else {
 				if(a == connectedNodes.size() -1 && temp.getID() == null) {
-					System.out.println("----------");
+					
 					temp = getMinNode();
 				}
 			}
@@ -79,7 +79,6 @@ public class Chord{
 				
 			}else {
 				if(a == connectedNodes.size() -1 && temp.getID() == null) {
-					System.out.println("----------");
 					temp = getMaxNode();
 				}
 			}

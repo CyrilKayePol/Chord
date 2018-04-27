@@ -24,7 +24,7 @@ public class Node{
 	
 	
 	private void createNodeID() throws NoSuchAlgorithmException {
-		String text = getIPAddress();
+		String text = getIPAddress()+""+port;
 		MessageDigest digest = MessageDigest.getInstance("SHA-1");
 		byte[] hash = digest.digest(text.getBytes(StandardCharsets.UTF_8));
 		StringBuffer hex = new StringBuffer();
@@ -81,6 +81,7 @@ public class Node{
 	}
 	
 	public void computeFingerTable() throws Exception {
+		System.out.println("Finger table of ["+id+"]");
 		for(int i = 0;i<3;i++) {
 			
 			BigInteger big = new BigInteger("0");
@@ -94,12 +95,5 @@ public class Node{
 			System.out.println(suc.getID());
 		}
 	}
-	
-	public static void main(String[] args) throws Exception {
-	
-	}
-
-
-
 	
 }

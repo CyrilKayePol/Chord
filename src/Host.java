@@ -36,13 +36,14 @@ public class Host{
 			if(string[0].equals("INIT")) {
 				new RandomNode(socket, packet.getAddress(), packet.getPort()).start();
 			}else if(string[0].equals("JOIN")){
-				new JoinProcess(new BigInteger(string[1]), string[2], packet.getPort()).start();
+				new JoinProcess(socket, new BigInteger(string[1]), string[2], packet.getPort()).start();
+				
 			}
 		}
 	}
 	
 	private void createRing() throws Exception {
-		Chord.createRing(new Node(InetAddress.getLocalHost().getHostAddress()+"kkkj", port));
+		Chord.createRing(new Node(InetAddress.getLocalHost().getHostAddress(), port));
 	}
 	
 	public static void main(String[] args) throws Exception{
