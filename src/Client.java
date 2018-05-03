@@ -1,60 +1,76 @@
-import java.io.IOException;
-import java.math.BigInteger;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class Client {
-	Node node;
+	Node node, rand, newNode;
 	DatagramSocket socket;
 	DatagramPacket packet;
 	Sender send;
-	int port = 4598;
+	int port = 9898;
 	int hostPort = 8888;
 	String nodeAdd;
 	int nodePort;
 	private byte[] buf = new byte[1024000];
+	private Object obj;
 	
 	public Client() throws Exception {
 		socket = new DatagramSocket(port);
 		node = new Node(InetAddress.getLocalHost().getHostAddress(), port);
-		// ask host to join
-		extractAddress(join("INIT", hostPort));
 		
-		// ask random node to join
-		join("JOIN_"+node.getID()+"_"+InetAddress.getLocalHost().getHostAddress(), nodePort);
+		 rand = join("INIT", hostPort);
+		 System.out.println("Node object received = "+rand.getPort());
 		
+		informNode();
+		//new Stabilize(node).start();
 		run();
 	}
 	
-	public void run() throws UnknownHostException {
+	public void run() {
 		while(true) {
 			DatagramPacket packet = new DatagramPacket(buf, buf.length);
 			try {
 				socket.receive(packet);
+				byte[] data = packet.getData();
+				ByteArrayInputStream in = new ByteArrayInputStream(data);
+				ObjectInputStream is = new ObjectInputStream(in);
 				
-			} catch (IOException e) {
-				
+				obj = is.readObject();
+			} catch (Exception e) {	
 				e.printStackTrace();
 			}
-	 
-			String received = new String(packet.getData(), 0, packet.getLength());
-			System.out.println("\n\t\t["+packet.getAddress()+": "+received+"]");
-			String[] string = received.split("_");
-			 if(string[0].equals("JOIN")){
-				new JoinProcess(socket, new BigInteger(string[1]), string[2], packet.getPort()).start();
+			
+			Node newNode = null;
+			if( obj instanceof String) {	
 				
+			}else if(obj instanceof Node) {
+				newNode = (Node) obj;
+				
+				new JoinProcess(socket,node ,newNode).start();
 			}
+			
 		}
 	}
 	
-	private String join(String message, int hostPort) throws UnknownHostException {
+	private Node join(String message, int hostPort) throws UnknownHostException {
 		System.out.println("Requesting to join. . .");
-
-		byte[] buf = message.getBytes();
+		Node n = null;
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		
-		send = new Sender(socket, buf, InetAddress.getLocalHost(), hostPort);
+		try {
+			ObjectOutputStream os = new ObjectOutputStream(outputStream);
+			os.writeObject(message);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		byte[] data = outputStream.toByteArray();
+		
+		send = new Sender(socket, data, InetAddress.getLocalHost(), hostPort);
 		send.start();
 		
 		buf = new byte[10240000];
@@ -63,23 +79,63 @@ public class Client {
 		System.out.println("waiting for response. . .");
 		try {
 			socket.receive(packet);
+			data = packet.getData();
+			ByteArrayInputStream in = new ByteArrayInputStream(data);
+			ObjectInputStream is = new ObjectInputStream(in);
+			
+			n = (Node) is.readObject();
+			
 		}catch(Exception e) {e.printStackTrace();}
 		
-		String received = new String(packet.getData(), 0, packet.getLength());
-		System.out.println("\n\t\t["+packet.getAddress()+": "+received+"]");
 		
-		return received;
+		return n;
 	}
 	
-	private void extractAddress(String s) {
-		String[] string = s.split("_");
-		nodeAdd = string[1];
-		System.out.println("extracted: "+nodeAdd);
-		nodePort = Integer.parseInt(string[2]);
-		System.out.println("extracted: "+nodePort);
+	private void informNode() throws UnknownHostException {
+		System.out.println("Informing random node. . .");
+		
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		
+		try {
+			ObjectOutputStream os = new ObjectOutputStream(outputStream);
+			os.writeObject(node);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		byte[] data = outputStream.toByteArray();
+		
+		send = new Sender(socket, data, InetAddress.getByName(rand.getIPAddress()), rand.getPort());
+		send.start();
+		
+		buf = new byte[10240000];
+		packet = new DatagramPacket(buf, buf.length);
+		
+		System.out.println("waiting for response. . .");
+		try {
+			DatagramPacket packet = new DatagramPacket(buf, buf.length);
+			try {
+				socket.receive(packet);
+				 data = packet.getData();
+				ByteArrayInputStream in = new ByteArrayInputStream(data);
+				ObjectInputStream is = new ObjectInputStream(in);
+				
+				obj = is.readObject();
+				
+				this.node = (Node) obj;
+				System.out.println("updated node. ");
+				System.out.println("pre = "+node.getPredecessor().getID());
+				System.out.println("suc = "+node.getSuccessor().getID());
+				
+			} catch (Exception e) {	
+				e.printStackTrace();
+			}
+		}catch(Exception e) {e.printStackTrace();}
+		
+		
+		
 	}
-
-	
 	public static void main(String[] args) throws Exception {
 		new Client();
 	}

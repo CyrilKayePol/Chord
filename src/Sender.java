@@ -3,23 +3,22 @@ import java.net.*;
 
 public class Sender extends Thread {
 	private DatagramSocket socket;
-	private byte[] buf;
+	private byte[] data;
 	private InetAddress address;
 	private int port;
 	
 	
-	public Sender(DatagramSocket socket, byte[] buf, InetAddress address, int port) {
+	public Sender(DatagramSocket socket, byte[] data, InetAddress address, int port) {
 		this.socket = socket;
-		this.buf = buf;
+		this.data = data;
 		this.address = address;
 		this.port = port;
 	}
 	public void run() {
 		
 			 try {
-				 DatagramPacket packet = new DatagramPacket(buf, buf.length, address, port);
-				
-				 socket.send(packet);
+				 DatagramPacket sendPacket = new DatagramPacket(data, data.length, address, port);
+				 socket.send(sendPacket);
 				
 			} catch (IOException e) {
 				e.printStackTrace();

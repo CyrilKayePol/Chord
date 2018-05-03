@@ -1,6 +1,7 @@
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.Random;
 
 public class RandomNode extends Thread {
@@ -16,16 +17,20 @@ public class RandomNode extends Thread {
 	@SuppressWarnings("deprecation")
 	public void run() {
 		Random rand = new Random();
-		int index = rand.nextInt(Chord.getConnectedNodesCount());
-		System.out.println("\nCOUNT = "+Chord.getConnectedNodesCount());
-		ArrayList<Node> nodes = Chord.getConnectedNodes();
-		String message = "RAND_"+nodes.get(index).getIPAddress()+"_"+nodes.get(index).getPort();
-		byte[] buf = message.getBytes();
+		int index = rand.nextInt(Host.connectedNodes.size());
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		
-		Sender send = new Sender(socket, buf, address, port);
+		try {
+			ObjectOutputStream os = new ObjectOutputStream(outputStream);
+			os.writeObject(Host.connectedNodes.get(index));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		byte[] data = outputStream.toByteArray();
+		
+		Sender send = new Sender(socket, data, address, port);
 		send.start();
 		
-		System.out.println("Host sent "+message+" successfully.");
 		stop();
 	}
 }
