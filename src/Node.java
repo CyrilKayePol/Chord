@@ -21,7 +21,6 @@ public class Node implements Serializable{
 		this.ip = ip;
 		isConnected = false;
 		this.port = port;
-		this.id = new BigInteger("50");
 		
 		for(int a = 0;a< finger.length; a++) {
 			finger[a] = this;
@@ -62,21 +61,13 @@ public class Node implements Serializable{
 		System.out.println("suc = "+successor.getID());
 		System.out.println("dis = "+this.getID());
 		// big > n && big <= successor
-		if((-1 == big.compareTo(successor.getID()) ||
-				( 0 == big.compareTo(successor.getID())) && 1 == big.compareTo(this.getID()))
-			|| 0 == big.compareTo(successor.getID()) ) {	
-			
+		if(1 == big.compareTo(this.getID()) && (-1 == big.compareTo(successor.getID()) ||
+				0 == big.compareTo(successor.getID()))) {
 			return successor;
 		}else {
 			temp = successor.closestPrecedingNode(n, id);
-			if(temp == null) {
-				temp =this;
-				System.out.println("mas dako an big kontra available ids");
-				return temp;
-			}
-			System.out.println("temp = "+temp.getPort());
-			if(temp == n) {
-				return n;
+			if(temp == this) {
+				return this;
 			}
 			return temp.findSucessor(n,id);
 		}
@@ -84,25 +75,15 @@ public class Node implements Serializable{
 	}
 	
 	public Node closestPrecedingNode(Node n, BigInteger id) {
-		for(int a = finger.length-1 ; a >= 1; a--) {
-			BigInteger big = finger[a].getID();
-			BigInteger dako = null;
-			if(n == null && id!=null) {
-				 dako = id;
-			}else if(n!=null && id == null) {
-				dako = n.getID();
-			}
-			//big > n && b< id
-			if(1 == big.compareTo(this.getID()) && -1 == big.compareTo(dako)) {
-				return finger[a];
-			}
-		}
-		return n;
+		System.out.println("successor.successor = "+successor.id);
+		return this.successor;
 	}
 	
 	public void create() {
-		predecessor = null;
+		predecessor = this;
 		successor = this;
+		//updateFingerTable();
+		new Stabilize(this).start();
 	}
 	
 	public void join(Node n) {
@@ -110,9 +91,9 @@ public class Node implements Serializable{
 		successor = n.findSucessor(this, null);
 		System.out.println("--------------------------------");
 		finger[0] = successor;
-		updateFingerTable();
+		//updateFingerTable();
 		
-		new Stabilize(this).start();
+		//new Stabilize(this).start();
 	}
 	
 	public void updateFingerTable() {
@@ -163,6 +144,10 @@ public class Node implements Serializable{
 	
 	public BigInteger getID() {
 		return id;
+	}
+	
+	public void setID(BigInteger id) {
+		this.id = id;
 	}
 	
 	public int getPort() {

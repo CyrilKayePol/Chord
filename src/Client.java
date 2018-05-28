@@ -2,6 +2,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -12,7 +13,7 @@ public class Client {
 	DatagramSocket socket;
 	DatagramPacket packet;
 	Sender send;
-	int port = 9898;
+	int port = 9999;
 	int hostPort = 8888;
 	String nodeAdd;
 	int nodePort;
@@ -22,10 +23,9 @@ public class Client {
 	public Client() throws Exception {
 		socket = new DatagramSocket(port);
 		node = new Node(InetAddress.getLocalHost().getHostAddress(), port);
-		
-		 rand = join("INIT", hostPort);
-		 System.out.println("Node object received = "+rand.getPort());
-		
+		node.setID(new BigInteger("12"));
+		rand = join("INIT", hostPort);
+		System.out.println("Node object received = "+rand.getID()+" "+rand.getPort()+" "+rand.getIPAddress());
 		informNode();
 		//new Stabilize(node).start();
 		run();
@@ -50,7 +50,6 @@ public class Client {
 				
 			}else if(obj instanceof Node) {
 				newNode = (Node) obj;
-				
 				new JoinProcess(socket,node ,newNode).start();
 			}
 			
@@ -125,7 +124,12 @@ public class Client {
 				
 				this.node = (Node) obj;
 				System.out.println("updated node. ");
-				System.out.println("pre = "+node.getPredecessor().getID());
+				if(node.getPredecessor()!=null) {
+					System.out.println("pre = "+node.getPredecessor().getID());
+				}else {
+					System.out.println("pre = null");
+				}
+				
 				System.out.println("suc = "+node.getSuccessor().getID());
 				
 			} catch (Exception e) {	

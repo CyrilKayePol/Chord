@@ -29,6 +29,7 @@ public class Stabilize extends Thread {
 		BigInteger big = n.getID();
 		if(node.getPredecessor()==null ||
 				(1 == big.compareTo(node.getPredecessor().getID()) && -1 == big.compareTo(node.getID()))){
+			System.out.println("set predecessor of "+node.getPort()+" "+node.getID()+" to " + n.getID());
 			node.setPredecessor(n);
 			
 		}

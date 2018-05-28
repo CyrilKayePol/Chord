@@ -20,6 +20,7 @@ public class JoinProcess extends Thread {
 		node.join(n);
 		node.setIsConnected(true);
 		System.out.println("Found successor of "+node.getPort() +": "+node.getSuccessor().getPort());
+		// notify found successor that its predecessor is now node
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		
 		try {

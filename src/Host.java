@@ -1,5 +1,6 @@
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
+import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -65,6 +66,7 @@ public class Host{
 	
 	private void createRing() throws Exception {
 		node = new Node(InetAddress.getLocalHost().getHostAddress(), port);
+		node.setID(new BigInteger("56"));
 		node.setFingerTable(computeFingerTable());
 		node.setIsConnected(true);
 		node.create();
